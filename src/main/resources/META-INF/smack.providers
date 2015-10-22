@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<smackProviders>
+    <iqProvider>
+        <elementName>pubsub</elementName>
+        <namespace>http://jabber.org/protocol/pubsub</namespace>
+        <className>com.leidos.xchangecore.core.infrastructure.xmpp.extensions.pubsub.PubSubIQProvider</className>
+    </iqProvider>
+    <iqProvider>
+        <elementName>pubsub</elementName>
+        <namespace>http://jabber.org/protocol/pubsub#owner</namespace>
+        <className>com.leidos.xchangecore.core.infrastructure.xmpp.extensions.pubsub.PubSubIQProvider</className>
+    </iqProvider>
+    <extensionProvider>
+        <elementName>event</elementName>
+        <namespace>http://jabber.org/protocol/pubsub#event</namespace>
+        <className>com.leidos.xchangecore.core.infrastructure.xmpp.extensions.pubsub.PubSubEventProvider</className>
+    </extensionProvider>
+    <iqProvider>
+        <elementName>interestgroupmgmt</elementName>
+        <namespace>http://uicds.saic.com/xmpp/extensions/interestgroupmgmt</namespace>
+        <className>com.leidos.xchangecore.core.infrastructure.xmpp.extensions.interestgroupmgmt.InterestGrpMgmtIQProvider</className>
+    </iqProvider>
+    <extensionProvider>
+        <elementName>interestgroupmgmt</elementName>
+        <namespace>http://uicds.saic.com/xmpp/extensions/interestgroupmgmt#event</namespace>
+        <className>com.leidos.xchangecore.core.infrastructure.xmpp.extensions.interestgroupmgmt.InterestGrpMgmtEventProvider</className>
+    </extensionProvider>
+    <iqProvider>
+        <elementName>core2coremessage</elementName>
+        <namespace>http://uicds.saic.com/xmpp/extensions/core2coremessage</namespace>
+        <className>com.leidos.xchangecore.core.infrastructure.xmpp.extensions.core2coremessage.Core2CoreMessageIQProvider</className>
+    </iqProvider>
+</smackProviders>

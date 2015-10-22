@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:util="http://www.springframework.org/schema/util"
+    xmlns:context="http://www.springframework.org/schema/context" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:integration="http://www.springframework.org/schema/integration"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration-2.0.xsd
+http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2..xsd
+http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+">
+    <context:annotation-config />
+
+    <!-- MESSAGE CHANNELS -->
+
+    <integration:publish-subscribe-channel id="newIncidentCreatedChannel" />
+    <integration:service-activator input-channel="newIncidentCreatedChannel"
+        ref="communicationsServiceXmpp" method="newIncidentCreatedHandler" />
+
+    <integration:publish-subscribe-channel id="getIncidentResponseChannel" />
+    <integration:service-activator input-channel="getIncidentResponseChannel"
+        ref="communicationsServiceXmpp" method="getIncidentResponseHandler" />
+
+    <integration:publish-subscribe-channel id="getProductResponseChannel" />
+    <integration:service-activator input-channel="getProductResponseChannel"
+        ref="communicationsServiceXmpp" method="getProductResponseHandler" />
+
+    <integration:publish-subscribe-channel id="getIncidentDocumentRequestChannel" />
+    <integration:service-activator input-channel="getIncidentDocumentRequestChannel"
+        ref="xmppMessageSender" method="getIncidentDocumentRequestHandler" />
+
+    <integration:publish-subscribe-channel id="getProductRequestChannel" />
+    <integration:service-activator input-channel="getProductRequestChannel"
+        ref="xmppMessageSender" method="getProductRequestHandler" />
+
+    <bean id="messageSender" class="package com.saic.dctd.uicds.xmpp.communications.XmppMessageSender" />
+
+    <!-- -->
+    <!-- SERVICES -->
+    <!-- -->
+    <!-- <bean id ="postInitializerRunner" class="com.saic.dctd.uicds.core.util.PostInitializerRunner"/>
+    -->
+
+    <bean id="communicationsServiceXmpp" class="com.saic.dctd.uicds.xmpp.communications.CommunicationsServiceXmppImpl">
+        <!--
+            <property name="defaultPropertiesFile" value="default.propties" />
+            <property name="rosterPropertiesFile" value="roster.properties" />
+            <property name="getIncidentDocumentRequestChannel" ref="getIncidentDocumentRequestChannel"/>
+            <property name="getProductRequestChannel" ref="getProductRequestChannel"/>
+        -->
+
+        <property name="interestManager" ref="interestManager" />
+    </bean>
+
+    <bean id="interestManager" class="com.saic.dctd.uicds.xmpp.communications.InterestManager">
+        <property name="coreConnection" ref="coreConnection" />
+    </bean>
+
+
+    <bean id="coreConnection" class="com.saic.dctd.uicds.xmpp.communications.CoreConnectionImpl">
+        <property name="defaultPropertiesFile" value="default.props" />
+        <property name="rosterPropertiesFile" value="roster.properties" />
+
+        <property name="server">
+            <value>hauar-m4300</value>
+        </property>
+        <property name="servername">
+            <value>hauar-m4300</value>
+        </property>
+        <property name="port">
+            <value>5222</value>
+        </property>
+        <property name="pubSubSvc">
+            <value>pubsub.hauar-m4300</value>
+        </property>
+        <property name="username">
+            <value>uicds</value>
+        </property>
+        <property name="password">
+            <value>uicds.1549</value>
+        </property>
+        <property name="name">
+            <value>UICDS</value>
+        </property>
+        <property name="resource">
+            <value>CoreConnection</value>
+        </property>
+        <property name="incidentRoot">
+            <value>/incident</value>
+        </property>
+        <property name="debug">
+            <value>true</value>
+        </property>
+        <property name="rosterProperties">
+            <props>
+                <prop key="interestmanager@hauar-m4300"> hauar-m4300 </prop>
+                <prop key="interestmanager@strummer"> strummer </prop>
+            </props>
+        </property>
+    </bean>
+
+
+</beans>

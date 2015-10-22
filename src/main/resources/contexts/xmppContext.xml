@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:integration="http://www.springframework.org/schema/integration"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/integration
+        http://www.springframework.org/schema/integration/spring-integration-2.0.xsd">
+
+    <import resource="xmppBeans.xml" />
+
+    <!-- MESSAGE CHANNELS Service Activators -->
+    <!-- The message channels are defined in applicationContext.xml -->
+    <integration:service-activator input-channel="shareInterestGroupChannel"
+        ref="communicationsServiceXmpp" method="shareInterestGroupHandler" />
+    <integration:service-activator input-channel="productPublicationChannel"
+        ref="communicationsServiceXmpp" method="productPublicationHandler" />
+    <integration:service-activator input-channel="productPublicationStatusChannel"
+        ref="communicationsServiceXmpp" method="productPublicationStatusHandler" />
+    <integration:service-activator input-channel="systemInitializedChannel"
+        ref="communicationsServiceXmpp" method="systemInitializedHandler" />
+    <integration:service-activator input-channel="agreementRosterChannel"
+        ref="communicationsServiceXmpp" method="agreementRosterHandler" />
+    <integration:service-activator input-channel="newInterestGroupCreatedChannel"
+        ref="communicationsServiceXmpp" method="newInterestGroupCreatedHandler" />
+    <integration:service-activator input-channel="joinedPublishProductRequestChannel"
+        ref="communicationsServiceXmpp" method="joinedPublishProductRequestHandler" />
+    <integration:service-activator input-channel="core2CoreMessageChannel"
+        ref="communicationsServiceXmpp" method="core2CoreMessageHandler" />
+    <integration:service-activator input-channel="deleteInterestGroupChannel"
+        ref="communicationsServiceXmpp" method="deleteInterestGroupHandler" />
+    <integration:service-activator input-channel="unSubscribeChannel"
+        ref="communicationsServiceXmpp" method="unSubscribeHandler" />
+    <integration:service-activator input-channel="pingChannel"
+        ref="communicationsServiceXmpp" method="pingHandler" />
+
+    <integration:publish-subscribe-channel id="deleteInterestGroupSharedFromRemoteCoreChannel" />
+
+    <bean id="agreementDAO" class="com.leidos.xchangecore.core.infrastructure.dao.hb.AgreementDAOHibernate" />
+
+    <!-- Communications Service XMPP beans -->
+
+    <bean id="coreConnection" parent="baseCoreConnection">
+        <property name="coreStatusUpdateChannel" ref="coreStatusUpdateChannel" />
+        <property name="agreementDAO" ref="agreementDAO" />
+    </bean>
+
+    <bean id="interestManager" parent="baseInterestManager">
+        <property name="coreConnection" ref="coreConnection" />
+        <property name="owningCoreWorkProductNotificationChannel" ref="owningCoreWorkProductNotificationChannel" />
+    </bean>
+
+    <bean id="core2CoreMessageProcessor"
+        class="com.leidos.xchangecore.core.infrastructure.xmpp.communications.Core2CoreMessageProcessor">
+        <property name="coreConnection" ref="coreConnection" />
+        <property name="core2CoreMessageNotificationChannel" ref="core2CoreMessageNotificationChannel" />
+        <property name="deleteInterestGroupSharedFromRemoteCoreChannel" ref="deleteInterestGroupSharedFromRemoteCoreChannel" />
+    </bean>
+
+    <bean id="interestGroupManager"
+        class="com.leidos.xchangecore.core.infrastructure.xmpp.communications.InterestGroupManager">
+        <property name="joinedInterestGroupNotificationChannel" ref="joinedInterestGroupNotificationChannel" />
+        <property name="joinedPublishProductNotificationChannel" ref="joinedPublishProductNotificationChannel" />
+        <property name="productPublicationStatusNotificationChannel" ref="productPublicationStatusNotificationChannel" />
+        <property name="deleteInterestGroupSharedFromRemoteCoreChannel" ref="deleteInterestGroupSharedFromRemoteCoreChannel" />
+        <property name="deleteJoinedInterestGroupNotificationChannel" ref="deleteJoinedInterestGroupNotificationChannel" />
+        <property name="deleteJoinedProductNotificationChannel" ref="deleteJoinedProductNotificationChannel" />
+        <property name="disseminationManagerChannel" ref="disseminationManagerChannel" />
+        <property name="coreConnection" ref="coreConnection" />
+        <property name="interestManager" ref="interestManager" />
+        <property name="ldapUtil" ref="ldapUtil" />
+    </bean>
+
+    <bean id="communicationsServiceXmpp"
+        class="com.leidos.xchangecore.core.infrastructure.xmpp.communications.CommunicationsServiceXmppImpl">
+        <property name="coreRosterChannel" ref="coreRosterChannel" />
+        <property name="core2CoreMessageProcessor" ref="core2CoreMessageProcessor" />
+        <property name="interestGroupManager" ref="interestGroupManager" />
+    </bean>
+
+    <!--
+        <bean id="orphanedNodesCleaner" class="com.leidos.xchangecore.core.infrastructure.xmpp.apps.OrphanedNodesCleaner">
+        <property name="coreConnection" ref="coreConnection" />
+        <property name="interestGroupManager" ref="interestGroupManager" />
+        </bean>
+
+        <bean id="nodeCleanerTask" class="org.springframework.scheduling.timer.ScheduledTimerTask">
+        <!- - run every X seconds (period in milliseconds) - ->
+        <property name="period" value="600000" />
+        <property name="timerTask" ref="orphanedNodesCleaner" />
+        </bean>
+
+        <bean id="nodeTimerFactory" class="org.springframework.scheduling.timer.TimerFactoryBean">
+        <property name="scheduledTimerTasks">
+        <list>
+        <ref bean="nodeCleanerTask" />
+        </list>
+        </property>
+        </bean>
+    -->
+
+    <!-- End of Communications Service XMPP beans -->
+
+</beans>
